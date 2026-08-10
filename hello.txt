@@ -5,3 +5,4 @@ echo = "third line"
 echo = four line
 echo = "feautre branch"
 echo = "second feature"
+echo = "third line from master"
