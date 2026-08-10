@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 echo = "Hello Git"
 echo = "Second line"
+echo = "third line"
