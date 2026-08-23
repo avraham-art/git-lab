@@ -36,6 +36,19 @@ pipeline {
             }
         }
 
+        stage('Record Current Version') {
+            steps {
+                script {
+                    env.PREVIOUS_IMAGE = sh(
+                        script: "docker inspect -f '{{.Config.Image}}' jenkins-demo-prod 2>/dev/null || true",
+                        returnStdout: true
+                    ).trim()
+
+                    echo "Previous image: ${env.PREVIOUS_IMAGE}"
+                }
+            }
+        }
+
         stage('Deploy') {
             steps {
                 sh '''
@@ -62,4 +75,3 @@ pipeline {
         }
     }
 }
-
