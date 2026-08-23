@@ -10,14 +10,4 @@ pipeline {
             }
         }
     }
-}pipeline {
-    agent any
-
-    stages {
-        stage('Build Docker Image') {
-            steps {
-                sh 'docker build -t jenkins-demo:${BUILD_NUMBER} .'
-            }
-        }
-    }
 }
