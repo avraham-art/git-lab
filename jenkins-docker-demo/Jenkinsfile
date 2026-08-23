@@ -4,6 +4,18 @@ pipeline {
     stages {
         stage('Build Docker Image') {
             steps {
+                dir('jenkins-docker-demo') {
+                    sh 'docker build -t jenkins-demo:${BUILD_NUMBER} .'
+                }
+            }
+        }
+    }
+}pipeline {
+    agent any
+
+    stages {
+        stage('Build Docker Image') {
+            steps {
                 sh 'docker build -t jenkins-demo:${BUILD_NUMBER} .'
             }
         }
