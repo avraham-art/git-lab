@@ -1,19 +1,45 @@
 pipeline {
     agent any
 
+    environment {
+        IMAGE = "avrahamfeelalive/jenkins-demo"
+        TAG = "${BUILD_NUMBER}"
+    }
+
     stages {
         stage('Build Docker Image') {
             steps {
                 dir('jenkins-docker-demo') {
-                    sh 'docker build -t jenkins-demo:${BUILD_NUMBER} .'
+                    sh 'docker build -t $IMAGE:$TAG .'
                 }
             }
         }
 
         stage('Scan Image') {
             steps {
-                sh 'trivy image --exit-code 1 --severity HIGH,CRITICAL jenkins-demo:${BUILD_NUMBER}'
+                sh 'trivy image --exit-code 1 --severity HIGH,CRITICAL $IMAGE:$TAG'
             }
+        }
+
+        stage('Push Image') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-credential',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_TOKEN'
+                )]) {
+                    sh '''
+                        echo "$DOCKER_TOKEN" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker push "$IMAGE:$TAG"
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            sh 'docker logout || true'
         }
     }
 }
