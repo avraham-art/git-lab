@@ -9,5 +9,11 @@ pipeline {
                 }
             }
         }
+
+        stage('Scan Image') {
+            steps {
+                sh 'trivy image --exit-code 1 --severity HIGH,CRITICAL jenkins-demo:${BUILD_NUMBER}'
+            }
+        }
     }
 }
