@@ -70,6 +70,25 @@ pipeline {
     }
 
     post {
+        failure {
+            script {
+                if (env.PREVIOUS_IMAGE?.trim()) {
+                    echo "Deployment failed. Rolling back to ${env.PREVIOUS_IMAGE}"
+
+                    sh '''
+                        docker rm -f jenkins-demo-prod || true
+                        docker pull "$PREVIOUS_IMAGE"
+                        docker run -d \
+                            --name jenkins-demo-prod \
+                            -p 8082:80 \
+                            "$PREVIOUS_IMAGE"
+                    '''
+                } else {
+                    echo "No previous image found. Rollback skipped."
+                }
+            }
+        }
+
         always {
             sh 'docker logout || true'
         }
