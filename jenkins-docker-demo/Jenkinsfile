@@ -21,6 +21,10 @@ pipeline {
             }
         }
 
+
+
+
+
         stage('Push Image') {
             steps {
                 withCredentials([usernamePassword(
@@ -35,7 +39,29 @@ pipeline {
                 }
             }
         }
+
+
     }
+
+
+stage('Deploy') {
+    steps {
+        sh '''
+            docker rm -f jenkins-demo-prod || true
+            docker pull $IMAGE:$TAG
+            docker run -d \
+                --name jenkins-demo-prod \
+                -p 8082:80 \
+                $IMAGE:$TAG
+        '''
+    }
+}
+
+stage('Verify') {
+    steps {
+        sh 'curl -fsS http://localhost:8082'
+    }
+}
 
     post {
         always {
